@@ -37,51 +37,98 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        Session session = sessionFactory.openSession();
-        User user = new User(name, lastName, age);
-        session.beginTransaction();
-        session.save(user);
-        session.getTransaction().commit();
-        session.close();
+        try (Session session = sessionFactory.openSession()) {
+            User user = new User(name, lastName, age);
+            session.beginTransaction();
+
+            try {
+                session.save(user);
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                System.out.println("Assumed: errors during query execution");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Assumed: errors related to SessionFactory or Session operations");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void removeUserById(long id) {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.createQuery(REMOVE_USER_BY_ID)
-                .setParameter(ID_PARAM, id)
-                .executeUpdate();
-        session.getTransaction().commit();
-        session.close();
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            try {
+                session.createQuery(REMOVE_USER_BY_ID)
+                        .setParameter(ID_PARAM, id)
+                        .executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                System.out.println("Assumed: errors during query execution");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Assumed: errors related to SessionFactory or Session operations");
+            e.printStackTrace();
+        }
     }
 
     @Override
     public List<User> getAllUsers() {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        List<User> users = session.createQuery(GET_ALL_USERS).getResultList();
-        session.getTransaction().commit();
-        session.close();
+        List<User> users = null;
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            try {
+                users = session.createQuery(GET_ALL_USERS).getResultList();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                System.out.println("Assumed: errors during query execution");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Assumed: errors related to SessionFactory or Session operations");
+            e.printStackTrace();
+        }
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.createQuery(REMOVE_ALL_USERS).executeUpdate();
-        session.getTransaction().commit();
-        session.close();
+        try (Session session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            try {
+                session.createQuery(REMOVE_ALL_USERS).executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                System.out.println("Assumed: errors during query execution");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Assumed: errors related to SessionFactory or Session operations");
+            e.printStackTrace();
+        }
+
     }
 
     private static void tableMethodHelper(String query) {
         SessionFactory factory = Util.getSessionFactoryHibernate();
-        Session session = factory.openSession();
-        session.beginTransaction();
-        session.createSQLQuery(query).executeUpdate();
-        session.getTransaction().commit();
-        session.close();
+        try (Session session = factory.openSession()) {
+            session.beginTransaction();
+
+            try {
+                session.createSQLQuery(query).executeUpdate();
+                session.getTransaction().commit();
+            } catch (Exception e) {
+                System.out.println("Assumed: errors during query execution");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Assumed: errors related to SessionFactory or Session operations");
+            e.printStackTrace();
+        }
     }
 
 }
